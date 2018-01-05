@@ -1,3 +1,6 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/spectre-team/spectre-data/badge)](https://www.codefactor.io/repository/github/spectre-team/spectre-data)
+[![BCH compliance](https://bettercodehub.com/edge/badge/spectre-team/spectre-data?branch=master)](https://bettercodehub.com/)
+
 ![Spectre](https://user-images.githubusercontent.com/1897842/31115297-0fe2c3aa-a822-11e7-90e6-92ceccf76137.jpg)
 
 # spectre-data
