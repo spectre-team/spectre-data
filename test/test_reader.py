@@ -79,6 +79,6 @@ class TestLoadImzML(unittest.TestCase):
     Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
     def test_loads_file(self):
         try:
-            data = rd.load_imzml(self.file_path)
-        except:
+            rd.load_imzml(self.file_path)
+        except Exception:
             self.fail()
