@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 
 import spdata.types as ty
-
+from pyimzml.ImzMLParser import ImzMLParser as imzparse
 
 def _parse_metadata(line: str) -> (int, int, int, int):
     x, y, z, label, *_ = line.split()
@@ -45,3 +45,26 @@ def load_txt(content) -> ty.Dataset:
     coordinates = ty.Coordinates(*zip(*coordinates))
 
     return ty.Dataset(data, coordinates, mzs, labels)
+
+def load_imzml(file_path) -> ty.Dataset:
+    """Load Dataset from imzml file
+
+    Args:
+        file_path: path to imzml file
+
+    Returns:
+        out: spdata.types.Dataset
+    """
+    with imzparse(file_path) as input_handle:
+        assert np.min(input_handle.mzLengths) == np.max(input_handle.mzLengths)
+        mzs = input_handle.getspectrum(0)[0]
+        spectra = [
+            input_handle.getspectrum(i)[1]
+            for i in range(len(input_handle.coordinates))
+        ]
+        coordinates = [
+            (x, y, z)
+            for idx, (x, y, z) in enumerate(input_handle.coordinates)
+        ]
+        coordinates = list(map(list, zip(*coordinates)))
+        return ty.Dataset(spectra, ty.Coordinates(coordinates[0], coordinates[1], coordinates[2]), mzs)

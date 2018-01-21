@@ -1,5 +1,6 @@
 import unittest
 import io
+import os
 
 import numpy.testing as npt
 
@@ -67,3 +68,15 @@ class TestLoadTxt(unittest.TestCase):
         npt.assert_equal(data.coordinates.x, self.expected_xs)
         npt.assert_equal(data.coordinates.y, self.expected_ys)
         npt.assert_equal(data.coordinates.z, self.expected_zs)
+
+class TestLoadImzML(unittest.TestCase):
+    def setUp(self):
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        file_name = "test.imzML"
+        self.file_path = os.path.join(this_dir, file_name)
+
+    def test_loads_file(self):
+        try:
+            data = rd.load_imzml(self.file_path)
+        except:
+            self.fail()
