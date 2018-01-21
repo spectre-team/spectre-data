@@ -75,6 +75,8 @@ class TestLoadImzML(unittest.TestCase):
         file_name = "test.imzML"
         self.file_path = os.path.join(this_dir, file_name)
 
+    @unittest.skip("Test file will be provided during integration tests. \
+    Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
     def test_loads_file(self):
         try:
             data = rd.load_imzml(self.file_path)
