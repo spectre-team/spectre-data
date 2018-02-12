@@ -70,11 +70,17 @@ class TestLoadTxt(unittest.TestCase):
         npt.assert_equal(data.coordinates.z, self.expected_zs)
 
 class MockParser:
-    def __init__(self, mzs, intensities, coordinates):
-        self.mzs = mzs
-        self.intensities = intensities
-        self.coordinates = coordinates
-        self.mzLengths = map(len, mzs)
+    def __init__(self, _):
+        self.mzs = [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+        self.intensities = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        self.coordinates = [(1, 1, 1), (2, 2, 2), (3, 3, 3)]
+        self.mzLengths = map(len, self.mzs)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
     
     def getspectrum(self, idx):
         return (self.mzs[idx], self.intensities[idx])
@@ -84,16 +90,9 @@ class TestLoadImzML(unittest.TestCase):
         this_dir = os.path.dirname(os.path.abspath(__file__))
         file_name = "test.imzML"
         self.file_path = os.path.join(this_dir, file_name)
-    '''
-    Test file will be provided during integration tests.
+    ''' Test file will be provided during integration tests.
     Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
     '''
     def test_loads_file(self):
-        mp = MockParser([[1, 2, 3], [1, 2, 3], [1, 2, 3]], \
-        [[1, 2, 3], [4, 5, 6], [7, 8, 9]], \
-        [(1, 1, 1), (2, 2, 2), (3, 3, 3)])
-        try:
-            with patch.object(imzparse.ImzMLParser, '__enter__', new = MagicMock(return_value = mp)):
-                rd.load_imzml(self.file_path)
-        except Exception:
-            self.fail()
+        with patch.object(imzparse, 'ImzMLParser', new=MockParser):
+            rd.load_imzml(self.file_path)
