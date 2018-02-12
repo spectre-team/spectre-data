@@ -1,11 +1,11 @@
 import unittest
 import io
 import os
-
+import pyimzml.ImzMLParser as imzparse
 import numpy.testing as npt
-
 import spdata.reader as rd
-
+from unittest.mock import patch
+from unittest.mock import MagicMock
 
 class TestParseMetadata(unittest.TestCase):
     def test_extracts_coordinates_as_ints(self):
@@ -69,16 +69,31 @@ class TestLoadTxt(unittest.TestCase):
         npt.assert_equal(data.coordinates.y, self.expected_ys)
         npt.assert_equal(data.coordinates.z, self.expected_zs)
 
+class MockParser:
+    def __init__(self, mzs, intensities, coordinates):
+        self.mzs = mzs
+        self.intensities = intensities
+        self.coordinates = coordinates
+        self.mzLengths = map(len, mzs)
+    
+    def getspectrum(self, idx):
+        return (self.mzs[idx], self.intensities[idx])
+    
 class TestLoadImzML(unittest.TestCase):
     def setUp(self):
         this_dir = os.path.dirname(os.path.abspath(__file__))
         file_name = "test.imzML"
         self.file_path = os.path.join(this_dir, file_name)
-
-    @unittest.skip("Test file will be provided during integration tests. \
+    '''
+    Test file will be provided during integration tests.
     Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
+    '''
     def test_loads_file(self):
+        mp = MockParser([[1, 2, 3], [1, 2, 3], [1, 2, 3]], \
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]], \
+        [(1, 1, 1), (2, 2, 2), (3, 3, 3)])
         try:
-            rd.load_imzml(self.file_path)
+            with patch.object(imzparse.ImzMLParser, '__enter__', new = MagicMock(return_value = mp)):
+                rd.load_imzml(self.file_path)
         except Exception:
             self.fail()
