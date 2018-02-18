@@ -88,11 +88,11 @@ class MockParser:
 class TestLoadImzML(unittest.TestCase):
     def setUp(self):
         this_dir = os.path.dirname(os.path.abspath(__file__))
-        file_name = "test.imzML"
+        file_name = "tests.imzML"
         self.file_path = os.path.join(this_dir, file_name)
-    ''' Test file will be provided during integration tests.
-    Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
-    '''
+    
+    # Test file will be provided during integration tests.
+    # Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
     def test_loads_file(self):
         with patch.object(imzparse, 'ImzMLParser', new=MockParser):
             rd.load_imzml(self.file_path)
