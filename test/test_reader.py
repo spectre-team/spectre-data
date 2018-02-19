@@ -1,10 +1,12 @@
 import unittest
 import io
-
+import os
+import pyimzml.ImzMLParser as imzparse
 import numpy.testing as npt
-
+import numpy as np
 import spdata.reader as rd
-
+from unittest.mock import patch
+from unittest.mock import MagicMock
 
 class TestParseMetadata(unittest.TestCase):
     def test_extracts_coordinates_as_ints(self):
@@ -67,3 +69,40 @@ class TestLoadTxt(unittest.TestCase):
         npt.assert_equal(data.coordinates.x, self.expected_xs)
         npt.assert_equal(data.coordinates.y, self.expected_ys)
         npt.assert_equal(data.coordinates.z, self.expected_zs)
+
+class MockParser:
+    def __init__(self, _):
+        self.mzs = [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+        self.intensities = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        self.coordinates = [(1, 1, 1), (2, 2, 2), (3, 3, 3)]
+        self.mzLengths = map(len, self.mzs)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+    
+    def getspectrum(self, idx):
+        return (self.mzs[idx], self.intensities[idx])
+    
+class TestLoadImzML(unittest.TestCase):
+    def setUp(self):
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        file_name = "tests.imzML"
+        self.file_path = os.path.join(this_dir, file_name)
+    
+    # Test file will be provided during integration tests.
+    # Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
+    def test_loads_file(self):
+        mock = MockParser('')
+        with patch.object(imzparse, 'ImzMLParser', new=MockParser):
+            dataset = rd.load_imzml(self.file_path)
+
+            npt.assert_equal(dataset.mz, np.array(mock.mzs[0])) 
+            npt.assert_equal(dataset.spectra, np.array(mock.intensities))
+
+            returnedCoords = list(zip(*mock.coordinates))
+            npt.assert_equal(dataset.coordinates.x, np.array(returnedCoords[0]))
+            npt.assert_equal(dataset.coordinates.y, np.array(returnedCoords[1]))
+            npt.assert_equal(dataset.coordinates.z, np.array(returnedCoords[2]))

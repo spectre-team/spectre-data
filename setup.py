@@ -28,7 +28,8 @@ setup(
     install_requires=[
         'numpy>=1.12.1',
         'tqdm>=4.11.2',
-        'typing>=3.6.2'
+        'typing>=3.6.2',
+        'pyimzml>=1.2.0'
     ],
     python_requires='>=3.4',
     package_data={
