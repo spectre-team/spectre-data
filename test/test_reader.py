@@ -3,6 +3,7 @@ import io
 import os
 import pyimzml.ImzMLParser as imzparse
 import numpy.testing as npt
+import numpy as np
 import spdata.reader as rd
 from unittest.mock import patch
 from unittest.mock import MagicMock
@@ -94,5 +95,14 @@ class TestLoadImzML(unittest.TestCase):
     # Test file will be provided during integration tests.
     # Link to the file: https://drive.google.com/drive/folders/1o02-7MJxW1ZsnC2iuHNlOy6zHpg8-q_2")
     def test_loads_file(self):
+        mock = MockParser('')
         with patch.object(imzparse, 'ImzMLParser', new=MockParser):
-            rd.load_imzml(self.file_path)
+            dataset = rd.load_imzml(self.file_path)
+
+            npt.assert_equal(dataset.mz, np.array(mock.mzs[0])) 
+            npt.assert_equal(dataset.spectra, np.array(mock.intensities))
+
+            returnedCoords = list(zip(*mock.coordinates))
+            npt.assert_equal(dataset.coordinates.x, np.array(returnedCoords[0]))
+            npt.assert_equal(dataset.coordinates.y, np.array(returnedCoords[1]))
+            npt.assert_equal(dataset.coordinates.z, np.array(returnedCoords[2]))
