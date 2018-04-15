@@ -1,19 +1,23 @@
 """Various methods for reading data"""
 
-from typing import List, Tuple
-import numpy as np
+import os
 
-import spdata.types as ty
+from typing import List, Tuple
+from common import Name, Path
+from utility import DatasetNotFoundError, UnsupportedExtensionError
+
+import numpy as np
+import types as ty
+import discover as disc
 import pyimzml.ImzMLParser as imzparse
+
 
 def _parse_metadata(line: str) -> (int, int, int, int):
     x, y, z, label, *_ = line.split()
     return int(x), int(y), int(z), int(label)
 
-
 def _parse_data(line: str) -> List[float]:
     return [float(value) for value in line.split()]
-
 
 def _load_entry(metadata_line: str, data_line: str) -> Tuple[
         Tuple[int, int, int], int, List[float]]:
@@ -21,16 +25,23 @@ def _load_entry(metadata_line: str, data_line: str) -> Tuple[
     data = _parse_data(data_line)
     return (x, y, z), label, data
 
+# Definition of loaders
 
-def load_txt(content) -> ty.Dataset:
+loaders = {}
+Loader = lambda ext : lambda f, ext : loaders.setdefault(ext, f)
+
+@Loader('.txt')
+def load_txt(file_path: Path) -> ty.Dataset:
     """Load Dataset from file
 
     Args:
-        content (iterable): data file content
+        file_path : data file path
 
     Returns:
         out: spdata.types.Dataset
     """
+    content = os.open(file_path).load_txt()
+
     iterator = iter(content)
     _ = next(iterator)  # unsupported global metadata
     mzs_line = next(iterator)
@@ -46,7 +57,8 @@ def load_txt(content) -> ty.Dataset:
 
     return ty.Dataset(data, coordinates, mzs, labels)
 
-def load_imzml(file_path) -> ty.Dataset:
+@Loader('.imzml')
+def imzml(file_path: Path) -> ty.Dataset:
     """Load Dataset from imzml file
 
     Args:
@@ -69,3 +81,14 @@ def load_imzml(file_path) -> ty.Dataset:
         ]
         coordinates = ty.Coordinates(*zip(*coordinates))
         return ty.Dataset(spectra, coordinates, mzs)
+
+
+def load_dataset(name: Name) -> ty.Dataset:
+    if not disc.dataset_exists(name):
+        raise DatasetNotFoundError(name)
+    path = disc.data_path(name)
+    _, extension = os.path.splitext(path)
+    if extension not in loaders.keys():
+        raise UnsupportedExtensionError(extension)
+    return loaders[extension](path)
+    
