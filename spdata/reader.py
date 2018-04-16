@@ -28,7 +28,14 @@ def _load_entry(metadata_line: str, data_line: str) -> Tuple[
 # Definition of loaders
 
 loaders = {}
-Loader = lambda ext : lambda f, ext : loaders.setdefault(ext, f)
+
+def Loader(ext: str):
+    def register_loader(f):
+        loaders.setdefault(ext, f)
+        def loader_wrapper(file_path: Path):
+            return f(file_path)
+        return loader_wrapper
+    return register_loader
 
 @Loader('.txt')
 def load_txt(file_path: Path) -> ty.Dataset:
