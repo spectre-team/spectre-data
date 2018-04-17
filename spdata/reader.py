@@ -2,9 +2,8 @@
 
 import os
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from common import Name, Path
-from utility import DatasetNotFoundError, UnsupportedExtensionError
 
 import numpy as np
 import discover as disc
@@ -91,12 +90,19 @@ def imzml(file_path: Path) -> ty.Dataset:
         return ty.Dataset(spectra, coordinates, mzs)
 
 
-def load_dataset(name: Name) -> ty.Dataset:
+def load_dataset(name: Name, allow_multiple=False) -> Union[ty.Dataset, List[ty.Dataset]]:
+    def fetch_dataset(dataset_path : Path):
+        _, extension = os.path.splitext(dataset_path)
+        if extension not in loaders.keys():
+            raise IOError('Unsupported type: ' + extension + ".")
+        return loaders[extension](dataset_path)
     if not disc.dataset_exists(name):
         raise IOError('Dataset ' + name + ' could not be found.')
     path = disc.dataset_path(name)
-    _, extension = os.path.splitext(path)
-    if extension not in loaders.keys():
-        raise IOError('Unsupported type: ' + extension + ".")
-    return loaders[extension](path)
+    if type(path) is List and allow_multiple == True:
+        result_multiple = []
+        for entry in path:
+            result_multiple.append(fetch_dataset(entry))
+        return result_multiple
+    return fetch_dataset(path)
     

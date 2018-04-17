@@ -2,7 +2,7 @@
 
 import os
 
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Union
 from functools import partial, lru_cache
 from hashlib import sha256
 from glob import glob
@@ -36,14 +36,17 @@ def id_to_name(element_id: int) -> Name:
 def list_datasets() -> List[Path]:
     return os.listdir(DATA_ROOT)
 
-def dataset_path(dataset_name: Name) -> Path:
+def dataset_path(dataset_name: Name) -> Union[Path, List[Path]]:
     """Discover path to dataset
     :param dataset_name: name of the dataset
     :return: path to the dataset file
     """
     name_root = os.path.join(DATA_ROOT, dataset_name)
-    file_path = glob(os.path.join(name_root, '*_data', '*.*'))
-    return file_path[1]
+    file_list = glob(os.path.join(name_root, '*_data', '*.*'))
+    if len(file_list) == 1:
+        return file_list[1]
+    else:
+        return file_list
 
 def is_dir(root: Path, name: Name) -> bool:
     """Check if name is dataset name in root directory"""
@@ -58,4 +61,3 @@ def get_datasets() -> List[Dict[Name, str]]:
 def dataset_exists(name: Name) -> bool:
     all_datasets = get_datasets()
     return name in all_datasets.values()
-
