@@ -3,13 +3,13 @@
 import os
 
 from typing import List, Tuple, Union
-from common import Name, Path
 
 import numpy as np
-import discover as disc
 import pyimzml.ImzMLParser as imzparse
 
 from . import types as ty
+from . import discover as disc
+from .common import Name, Path
 
 def _parse_metadata(line: str) -> (int, int, int, int):
     x, y, z, label, *_ = line.split()
@@ -47,7 +47,7 @@ def load_txt(file_path: Path) -> ty.Dataset:
     Returns:
         out: spdata.types.Dataset
     """
-    content = os.open(file_path).load_txt()
+    content = os.open(file_path)
 
     iterator = iter(content)
     _ = next(iterator)  # unsupported global metadata
@@ -65,7 +65,7 @@ def load_txt(file_path: Path) -> ty.Dataset:
     return ty.Dataset(data, coordinates, mzs, labels)
 
 @Loader('.imzml')
-def imzml(file_path: Path) -> ty.Dataset:
+def load_imzml(file_path: Path) -> ty.Dataset:
     """Load Dataset from imzml file
 
     Args:
@@ -91,7 +91,7 @@ def imzml(file_path: Path) -> ty.Dataset:
 
 
 def load_dataset(name: Name, allow_multiple=False) -> Union[ty.Dataset, List[ty.Dataset]]:
-    def fetch_dataset(dataset_path : Path):
+    def fetch_dataset(dataset_path : Path) -> ty.Dataset:
         _, extension = os.path.splitext(dataset_path)
         if extension not in loaders.keys():
             raise IOError('Unsupported type: ' + extension + ".")
