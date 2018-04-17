@@ -7,10 +7,10 @@ from common import Name, Path
 from utility import DatasetNotFoundError, UnsupportedExtensionError
 
 import numpy as np
-import types as ty
 import discover as disc
 import pyimzml.ImzMLParser as imzparse
 
+from . import types as ty
 
 def _parse_metadata(line: str) -> (int, int, int, int):
     x, y, z, label, *_ = line.split()
@@ -26,12 +26,13 @@ def _load_entry(metadata_line: str, data_line: str) -> Tuple[
     return (x, y, z), label, data
 
 # Definition of loaders
-
+from functools import wraps
 loaders = {}
 
 def Loader(ext: str):
     def register_loader(f):
         loaders.setdefault(ext, f)
+        @wraps(f)
         def loader_wrapper(file_path: Path):
             return f(file_path)
         return loader_wrapper
@@ -93,7 +94,7 @@ def imzml(file_path: Path) -> ty.Dataset:
 def load_dataset(name: Name) -> ty.Dataset:
     if not disc.dataset_exists(name):
         raise DatasetNotFoundError(name)
-    path = disc.data_path(name)
+    path = disc.dataset_path(name)
     _, extension = os.path.splitext(path)
     if extension not in loaders.keys():
         raise UnsupportedExtensionError(extension)
