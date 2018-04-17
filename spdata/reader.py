@@ -93,10 +93,10 @@ def imzml(file_path: Path) -> ty.Dataset:
 
 def load_dataset(name: Name) -> ty.Dataset:
     if not disc.dataset_exists(name):
-        raise DatasetNotFoundError(name)
+        raise IOError('Dataset ' + name + ' could not be found.')
     path = disc.dataset_path(name)
     _, extension = os.path.splitext(path)
     if extension not in loaders.keys():
-        raise UnsupportedExtensionError(extension)
+        raise IOError('Unsupported type: ' + extension + ".")
     return loaders[extension](path)
     
