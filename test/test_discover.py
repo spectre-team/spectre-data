@@ -39,3 +39,14 @@ class TestIdToName(unittest.TestCase):
         mock.return_value = test_datasets
         with self.assertRaises(disc.UnknownIdError):
             disc.id_to_name(123)
+
+class TestDatasetExists(unittest.TestCase):
+    @patch('spdata.discover.get_datasets')
+    def test_returns_true_for_existing_dataset(self, mock):
+        mock.return_value = test_datasets
+        self.assertEqual(disc.dataset_exists("dataset number one"), True)
+
+    @patch('spdata.discover.get_datasets')
+    def test_returns_false_for_nonexisting_dataset(self, mock):
+        mock.return_value = test_datasets
+        self.assertEqual(disc.dataset_exists("dataset number four"), False)

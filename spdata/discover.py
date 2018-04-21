@@ -33,9 +33,6 @@ def id_to_name(element_id: int) -> Name:
         raise UnknownIdError(element_id)
     return matching[0]
 
-def list_datasets() -> List[Path]:
-    return os.listdir(DATA_ROOT)
-
 def dataset_path(dataset_name: Name) -> Union[Path, List[Path]]:
     """Discover path to dataset
     :param dataset_name: name of the dataset
@@ -52,6 +49,9 @@ def is_dir(root: Path, name: Name) -> bool:
     """Check if name is dataset name in root directory"""
     return os.path.isdir(os.path.join(root, name))
 
+def list_datasets() -> List[Path]:
+    return os.listdir(DATA_ROOT)
+
 def get_datasets() -> List[Dict[Name, str]]:
     """"Get datasets available in the store"""
     is_dataset_name = partial(is_dir, DATA_ROOT)
@@ -60,4 +60,5 @@ def get_datasets() -> List[Dict[Name, str]]:
 
 def dataset_exists(name: Name) -> bool:
     all_datasets = get_datasets()
-    return name in all_datasets.values()
+    name_list = [_name for _, _name in enumerate(d['name'] for d in all_datasets)]
+    return name in name_list
