@@ -7,7 +7,7 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
-    
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -124,7 +124,7 @@ def load_dataset(name: Name, allow_multiple=False) -> Union[ty.Dataset, List[ty.
     if not disc.dataset_exists(name):
         raise IOError('Dataset ' + name + ' could not be found.')
     path = disc.dataset_path(name)
-    if type(path) is List and allow_multiple == True:
+    if isinstance(path, List) and allow_multiple is True:
         result_multiple = []
         for entry in path:
             result_multiple.append(fetch_dataset(entry))
