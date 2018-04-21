@@ -45,17 +45,12 @@ def dataset_path(dataset_name: Name) -> Union[Path, List[Path]]:
     else:
         return file_list
 
-def is_dir(root: Path, name: Name) -> bool:
-    """Check if name is dataset name in root directory"""
-    return os.path.isdir(os.path.join(root, name))
-
-def list_datasets() -> List[Path]:
-    return os.listdir(DATA_ROOT)
-
 def get_datasets() -> List[Dict[Name, str]]:
     """"Get datasets available in the store"""
+    def is_dir(root: Path, name: Name) -> bool:
+        return os.path.isdir(os.path.join(root, name))
     is_dataset_name = partial(is_dir, DATA_ROOT)
-    datasets = filter(is_dataset_name, list_datasets())
+    datasets = filter(is_dataset_name, os.listdir(DATA_ROOT))
     return [{"name": as_readable(name), "value": name} for name in datasets]
 
 def dataset_exists(name: Name) -> bool:

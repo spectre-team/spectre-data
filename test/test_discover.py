@@ -13,6 +13,12 @@ test_datasets = [
     { "name": "dataset number three", "value": "dataset_number_three"}
 ]
 
+test_listdir = [
+    "dataset_number_one",
+    "dataset_number_two",
+    "dataset_number_three"
+]
+
 class TestNameToId(unittest.TestCase):
     @patch('spdata.discover.get_datasets')
     def test_generates_some_unique_ids(self, mock):
@@ -40,13 +46,25 @@ class TestIdToName(unittest.TestCase):
         with self.assertRaises(disc.UnknownIdError):
             disc.id_to_name(123)
 
+class TestGetDatasets(unittest.TestCase):
+    @patch('os.listdir')
+    @patch('os.path.isdir')
+    def test_returns_correct_datasets_set(self, mock_isdir, mock_listdir):
+        mock_isdir.return_value = True
+        mock_listdir.return_value = test_listdir 
+        self.assertEqual(disc.get_datasets(), test_datasets)
+
 class TestDatasetExists(unittest.TestCase):
-    @patch('spdata.discover.get_datasets')
-    def test_returns_true_for_existing_dataset(self, mock):
-        mock.return_value = test_datasets 
+    @patch('os.listdir')
+    @patch('os.path.isdir')
+    def test_returns_true_for_existing_dataset(self, mock_isdir, mock_listdir):
+        mock_isdir.return_value = True
+        mock_listdir.return_value = test_listdir 
         self.assertTrue(disc.dataset_exists("dataset number one"))
 
-    @patch('spdata.discover.get_datasets')
-    def test_returns_false_for_nonexisting_dataset(self, mock):
-        mock.return_value = test_datasets
+    @patch('os.listdir')
+    @patch('os.path.isdir')
+    def test_returns_false_for_nonexisting_dataset(self, mock_isdir, mock_listdir):
+        mock_isdir.return_value = True
+        mock_listdir.return_value = test_listdir 
         self.assertFalse(disc.dataset_exists("dataset number four"))
