@@ -27,7 +27,7 @@ def id_to_name(element_id: int) -> Name:
     :param element_id: id of the element in names list
     :return: name of the element under given id
     """
-    matching = [_name for _name in get_datasets().values()
+    matching = [_name for _, _name in enumerate(d['name'] for d in get_datasets())
                 if name_to_id(_name) == element_id]
     if len(matching) == 0:
         raise UnknownIdError(element_id)
