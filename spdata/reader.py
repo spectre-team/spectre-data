@@ -1,4 +1,19 @@
-"""Various methods for reading data"""
+"""Various methods for reading data
+
+Copyright 2018 Spectre Team
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
 
 import os
 
@@ -91,6 +106,16 @@ def load_imzml(file_path: Path) -> ty.Dataset:
 
 
 def load_dataset(name: Name, allow_multiple=False) -> Union[ty.Dataset, List[ty.Dataset]]:
+    """Generic, universal method for loading single dataset of possibly multiple formats
+
+    Args:
+        name: name of desired dataset
+        allow_multiple: flag for possibility of loading multiple formats of single dataset
+
+    Returns:
+        out: either single dataset or list of datasets
+    
+    """
     def fetch_dataset(dataset_path : Path) -> ty.Dataset:
         _, extension = os.path.splitext(dataset_path)
         if extension not in loaders.keys():
