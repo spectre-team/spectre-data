@@ -112,3 +112,17 @@ class TestLoadImzML(unittest.TestCase):
             npt.assert_equal(dataset.coordinates.x, np.array(returnedCoords[0]))
             npt.assert_equal(dataset.coordinates.y, np.array(returnedCoords[1]))
             npt.assert_equal(dataset.coordinates.z, np.array(returnedCoords[2]))
+
+class TestGenericLoad(unittest.TestCase):
+    def setUp(self):
+        self.test_datasets = [
+            { "name": "dataset number one", "value": "dataset_number_one"},
+            { "name": "dataset number two", "value": "dataset_number_two"},
+            { "name": "dataset number three", "value": "dataset_number_three"}
+        ]
+
+    @patch("spdata.discover.get_datasets")
+    def test_throws_on_nonexistent_dataset(self, mock_get):
+        mock_get.return_value = self.test_datasets
+        with self.assertRaises(IOError):
+            rd.load_dataset("dataset number four")
