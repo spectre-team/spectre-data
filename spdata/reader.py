@@ -17,7 +17,7 @@ limitations under the License.
 
 import os
 
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import numpy as np
 import pyimzml.ImzMLParser as imzparse
@@ -105,7 +105,7 @@ def load_imzml(file_path: Path) -> ty.Dataset:
         return ty.Dataset(spectra, coordinates, mzs)
 
 
-def load_dataset(name: Name, allow_multiple=False) -> Union[ty.Dataset, List[ty.Dataset]]:
+def load_dataset(name: Name, allow_multiple=False) -> ty.Dataset:
     """Generic, universal method for loading single dataset of possibly multiple formats
 
     Args:
@@ -116,18 +116,11 @@ def load_dataset(name: Name, allow_multiple=False) -> Union[ty.Dataset, List[ty.
         out: either single dataset or list of datasets
     
     """
-    def fetch_dataset(dataset_path : Path) -> ty.Dataset:
-        _, extension = os.path.splitext(dataset_path)
-        if extension not in loaders.keys():
-            raise IOError('Unsupported type: ' + extension + ".")
-        return loaders[extension](dataset_path)
     if not disc.dataset_exists(name):
         raise IOError('Dataset ' + name + ' could not be found.')
     path = disc.dataset_path(name)
-    if isinstance(path, List) and allow_multiple is True:
-        result_multiple = []
-        for entry in path:
-            result_multiple.append(fetch_dataset(entry))
-        return result_multiple
-    return fetch_dataset(path)
+    _, extension = os.path.splitext(path)
+    if extension not in loaders.keys():
+        raise IOError('Unsupported type: ' + extension + ".")
+    return loaders[extension](path)
     
