@@ -106,14 +106,13 @@ def load_imzml(file_path: Path) -> ty.Dataset:
 
 
 def load_dataset(name: Name) -> ty.Dataset:
-    """Generic, universal method for loading single dataset of possibly multiple formats
+    """Generic, universal method for loading single dataset of arbitrary registered format
 
     Args:
         name: name of desired dataset
-        allow_multiple: flag for possibility of loading multiple formats of single dataset
 
     Returns:
-        out: either single dataset or list of datasets
+        out: the dataset itself
     
     """
     if not disc.dataset_exists(name):
