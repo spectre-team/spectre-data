@@ -105,7 +105,7 @@ def load_imzml(file_path: Path) -> ty.Dataset:
         return ty.Dataset(spectra, coordinates, mzs)
 
 
-def load_dataset(name: Name, allow_multiple=False) -> ty.Dataset:
+def load_dataset(name: Name) -> ty.Dataset:
     """Generic, universal method for loading single dataset of possibly multiple formats
 
     Args:
