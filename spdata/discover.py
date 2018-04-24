@@ -17,7 +17,7 @@ limitations under the License.
 
 import os
 
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional
 from functools import partial, lru_cache
 from hashlib import sha256
 from glob import glob
@@ -49,7 +49,7 @@ def id_to_name(element_id: int) -> Name:
     Returns:
         out: name of the element under given id
     """
-    matching = [_name for _, _name in enumerate(d['name'] for d in get_datasets())
+    matching = [_name for d in get_datasets() for _name in d.values()
                 if name_to_id(_name) == element_id]
     if not matching:
         raise UnknownIdError(element_id)
