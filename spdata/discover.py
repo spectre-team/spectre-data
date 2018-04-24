@@ -79,7 +79,7 @@ def get_datasets() -> List[Dict[Name, str]]:
     return [{"name": as_readable(name), "value": name} for name in datasets]
 
 def dataset_exists(name: Name) -> bool:
-    """Discover path to dataset.
+    """Checks if dataset with given name exists.
     Args:
         name: Name of the dataset.
 
