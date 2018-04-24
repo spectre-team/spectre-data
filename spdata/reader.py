@@ -54,13 +54,13 @@ def Loader(ext: str):
 
 @Loader('.txt')
 def load_txt(file_path: Path) -> ty.Dataset:
-    """Load Dataset from file
+    """Load Dataset from file.
 
     Args:
-        file_path : data file path
+        file_path : Data file path.
 
     Returns:
-        out: spdata.types.Dataset
+        spdata.types.Dataset
     """
     content = os.open(file_path)
 
@@ -81,13 +81,13 @@ def load_txt(file_path: Path) -> ty.Dataset:
 
 @Loader('.imzml')
 def load_imzml(file_path: Path) -> ty.Dataset:
-    """Load Dataset from imzml file
+    """Load Dataset from imzml file.
 
     Args:
-        file_path: path to imzml file
+        file_path: Path to imzml file.
 
     Returns:
-        out: spdata.types.Dataset
+        The dataset itself.
     """
     with imzparse.ImzMLParser(file_path) as input_handle:
         if np.min(input_handle.mzLengths) != np.max(input_handle.mzLengths):
@@ -106,13 +106,13 @@ def load_imzml(file_path: Path) -> ty.Dataset:
 
 
 def load_dataset(name: Name) -> ty.Dataset:
-    """Generic, universal method for loading single dataset of arbitrary registered format
+    """Generic, universal method for loading single dataset of arbitrary registered format.
 
     Args:
-        name: name of desired dataset
+        name: Name of desired dataset.
 
     Returns:
-        out: the dataset itself
+        The dataset itself.
     
     """
     if not disc.dataset_exists(name):

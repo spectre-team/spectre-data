@@ -33,21 +33,21 @@ def name_to_id(entity_name: str) -> int:
     Computes SHA256 hash of name and converts it to int value.
 
     Args:
-        entity_name: name of an object
+        entity_name: Name of an object.
 
     Returns:
-        out: unique identifier
+        Unique identifier.
     """
     hex_hash = sha256(entity_name.encode()).hexdigest()
     return int(hex_hash, 16) % MAX_JAVASCRIPT_SAFE_INT
 
 def id_to_name(element_id: int) -> Name:
-    """Resolve element name by its id
+    """Resolve element name by its id.
     Args:
-        element_id: id of the element in names list
+        element_id: ID of the element in names list.
 
     Returns:
-        out: name of the element under given id
+        Name of the element under given id.
     """
     matching = [_name for d in get_datasets() for _name in d.values()
                 if name_to_id(_name) == element_id]
@@ -56,21 +56,21 @@ def id_to_name(element_id: int) -> Name:
     return matching[0]
 
 def dataset_path(dataset_name: Name) -> Path:
-    """Discover path to dataset
+    """Discover path to dataset.
     Args:
-        dataset_name: name of the dataset
+        dataset_name: Name of the dataset.
 
     Returns:
-        out: path to the dataset file
+        Path to the dataset file.
     """
     name_root = os.path.join(DATA_ROOT, dataset_name)
     file_list = glob(os.path.join(name_root, '*_data', '*.*'))
     return file_list[1]
 
 def get_datasets() -> List[Dict[Name, str]]:
-    """"Get datasets available in the store
+    """"Get datasets available in the store.
     Returns:
-        out: list of dataset entries
+        List of dataset entries.
     """
     def is_dir(root: Path, name: Name) -> bool:
         return os.path.isdir(os.path.join(root, name))
@@ -79,12 +79,12 @@ def get_datasets() -> List[Dict[Name, str]]:
     return [{"name": as_readable(name), "value": name} for name in datasets]
 
 def dataset_exists(name: Name) -> bool:
-    """Discover path to dataset
+    """Discover path to dataset.
     Args:
-        name: name of the dataset
+        name: Name of the dataset.
 
     Returns:
-        out: True if dataset is in the filesystem, False otherwise
+        True if dataset is in the filesystem, False otherwise.
     """
     all_datasets = get_datasets()
     name_list = [_name for _, _name in enumerate(d['name'] for d in all_datasets)]
