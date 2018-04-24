@@ -65,7 +65,7 @@ def dataset_path(dataset_name: Name) -> Path:
     """
     name_root = os.path.join(DATA_ROOT, dataset_name)
     file_list = glob(os.path.join(name_root, '*_data', '*.*'))
-    return file_list[1]
+    return file_list[0]
 
 def get_datasets() -> List[Dict[Name, str]]:
     """"Get datasets available in the store.
