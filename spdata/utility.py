@@ -23,4 +23,3 @@ def as_readable(dataset_name: str) -> Name:
 
 class UnknownIdError(KeyError):
     """Thrown when id of element could not be resolved"""
-    pass

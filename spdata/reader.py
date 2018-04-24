@@ -18,6 +18,7 @@ limitations under the License.
 import os
 
 from typing import List, Tuple
+from functools import wraps
 
 import numpy as np
 import pyimzml.ImzMLParser as imzparse
@@ -40,10 +41,9 @@ def _load_entry(metadata_line: str, data_line: str) -> Tuple[
     return (x, y, z), label, data
 
 # Definition of loaders
-from functools import wraps
 loaders = {}
 
-def Loader(ext: str):
+def loader(ext: str):
     def register_loader(f):
         loaders.setdefault(ext, f)
         @wraps(f)
@@ -52,7 +52,7 @@ def Loader(ext: str):
         return loader_wrapper
     return register_loader
 
-@Loader('.txt')
+@loader('.txt')
 def load_txt(file_path: Path) -> ty.Dataset:
     """Load Dataset from file.
 
@@ -62,24 +62,23 @@ def load_txt(file_path: Path) -> ty.Dataset:
     Returns:
         spdata.types.Dataset
     """
-    content = os.open(file_path)
+    with os.open(file_path) as f:
+        iterator = iter(f)
+        _ = next(iterator)  # unsupported global metadata
+        mzs_line = next(iterator)
 
-    iterator = iter(content)
-    _ = next(iterator)  # unsupported global metadata
-    mzs_line = next(iterator)
+        mzs = [float(mz) for mz in mzs_line.split()]
 
-    mzs = [float(mz) for mz in mzs_line.split()]
+        entries = map(_load_entry, iterator, iterator)
 
-    entries = map(_load_entry, iterator, iterator)
+        coordinates, labels, data = zip(*entries)
 
-    coordinates, labels, data = zip(*entries)
-
-    data = np.vstack(data)
-    coordinates = ty.Coordinates(*zip(*coordinates))
+        data = np.vstack(data)
+        coordinates = ty.Coordinates(*zip(*coordinates))
 
     return ty.Dataset(data, coordinates, mzs, labels)
 
-@Loader('.imzml')
+@loader('.imzml')
 def load_imzml(file_path: Path) -> ty.Dataset:
     """Load Dataset from imzml file.
 
