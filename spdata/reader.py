@@ -17,7 +17,7 @@ limitations under the License.
 
 import os
 
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 from functools import wraps
 
 import numpy as np
@@ -44,7 +44,7 @@ def _load_entry(metadata_line: str, data_line: str) -> Tuple[
 loaders = {}
 
 def loader(ext: str):
-    def register_loader(f):
+    def register_loader(f : Callable[[Path], ty.Dataset]):
         loaders.setdefault(ext, f)
         @wraps(f)
         def loader_wrapper(file_path: Path):
