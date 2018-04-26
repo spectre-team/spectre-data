@@ -86,4 +86,4 @@ def dataset_exists(name: Name) -> bool:
     Returns:
         True if dataset is in the filesystem, False otherwise.
     """
-    return any(name == _name for d in get_datasets() for _name in d.values() )
+    return any(name in d.values() for d in get_datasets())
