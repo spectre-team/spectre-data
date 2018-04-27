@@ -1,3 +1,20 @@
+"""Test for reader module
+
+Copyright 2018 Spectre Team
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+
 import unittest
 import io
 import os
@@ -54,18 +71,24 @@ class TestLoadTxt(unittest.TestCase):
 98.7 65.4 32.1
 """)
 
-    def test_loads_mzs(self):
-        data = rd.load_txt(self.test_file)
+    @patch('os.open')
+    def test_loads_mzs(self, mock_open):
+        mock_open.return_value = self.test_file
+        data = rd.load_txt('some_path.txt')
         npt.assert_equal(data.mz, self.expected_mz)
 
-    def test_loads_all_spectra(self):
-        data = rd.load_txt(self.test_file)
+    @patch('os.open')
+    def test_loads_all_spectra(self, mock_open):
+        mock_open.return_value = self.test_file
+        data = rd.load_txt('some_path.txt')
         self.assertEqual(data.spectra.shape[0], self.expected_spectra_number)
         for spectrum, expected in zip(data.spectra, self.expected_spectra):
             npt.assert_equal(spectrum, expected)
 
-    def test_loads_all_coordinates(self):
-        data = rd.load_txt(self.test_file)
+    @patch('os.open')
+    def test_loads_all_coordinates(self, mock_open):
+        mock_open.return_value = self.test_file
+        data = rd.load_txt('some_path.txt')
         npt.assert_equal(data.coordinates.x, self.expected_xs)
         npt.assert_equal(data.coordinates.y, self.expected_ys)
         npt.assert_equal(data.coordinates.z, self.expected_zs)
@@ -106,3 +129,17 @@ class TestLoadImzML(unittest.TestCase):
             npt.assert_equal(dataset.coordinates.x, np.array(returnedCoords[0]))
             npt.assert_equal(dataset.coordinates.y, np.array(returnedCoords[1]))
             npt.assert_equal(dataset.coordinates.z, np.array(returnedCoords[2]))
+
+class TestGenericLoad(unittest.TestCase):
+    def setUp(self):
+        self.test_datasets = [
+            { "name": "dataset number one", "value": "dataset_number_one"},
+            { "name": "dataset number two", "value": "dataset_number_two"},
+            { "name": "dataset number three", "value": "dataset_number_three"}
+        ]
+
+    @patch("spdata.discover.get_datasets")
+    def test_throws_on_nonexistent_dataset(self, mock_get):
+        mock_get.return_value = self.test_datasets
+        with self.assertRaises(IOError):
+            rd.load_dataset("dataset number four")
