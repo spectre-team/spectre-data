@@ -71,13 +71,13 @@ class TestLoadTxt(unittest.TestCase):
 98.7 65.4 32.1
 """)
 
-    @patch('os.open')
+    @patch('builtins.open')
     def test_loads_mzs(self, mock_open):
         mock_open.return_value = self.test_file
         data = rd.load_txt('some_path.txt')
         npt.assert_equal(data.mz, self.expected_mz)
 
-    @patch('os.open')
+    @patch('builtins.open')
     def test_loads_all_spectra(self, mock_open):
         mock_open.return_value = self.test_file
         data = rd.load_txt('some_path.txt')
@@ -85,7 +85,7 @@ class TestLoadTxt(unittest.TestCase):
         for spectrum, expected in zip(data.spectra, self.expected_spectra):
             npt.assert_equal(spectrum, expected)
 
-    @patch('os.open')
+    @patch('builtins.open')
     def test_loads_all_coordinates(self, mock_open):
         mock_open.return_value = self.test_file
         data = rd.load_txt('some_path.txt')

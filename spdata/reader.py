@@ -62,7 +62,7 @@ def load_txt(file_path: Path) -> ty.Dataset:
     Returns:
         spdata.types.Dataset
     """
-    with os.open(file_path) as f:
+    with open(file_path) as f:
         iterator = iter(f)
         _ = next(iterator)  # unsupported global metadata
         mzs_line = next(iterator)
